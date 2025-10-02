@@ -14,19 +14,55 @@ export default function CopyPage(){
             key: "", // Add key to state
         }
     );
-    
-    const getData = async (e) => { // Define getData function
+    const [timeRemaining, setTimeRemaining]= useState(null);
+    const [clipCreatedAt, setClipCreatedAt] = useState(null); // New state for createdAt
+
+    // Effect for the countdown timer
+    useEffect(() => {
+        let timer;
+        if (clipCreatedAt) {
+            const expirationTime = new Date(clipCreatedAt).getTime() + (2 * 60 * 1000); // 2 minutes in milliseconds
+
+            timer = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = expirationTime - now;
+
+                if (distance < 0) {
+                    clearInterval(timer);
+                    setTimeRemaining("Expired!");
+                    setData(prevData => ({ ...prevData, content: "" })); // Clear content if expired
+                    toast.error("Clip has expired and been deleted!");
+                } else {
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                    setTimeRemaining(`${minutes}m ${seconds}s`);
+                }
+            }, 1000);
+        }
+
+        // Cleanup function for the interval
+        return () => clearInterval(timer);
+    }, [clipCreatedAt]); // Re-run effect when clipCreatedAt changes
+    const getData = async (e) => {
         e.preventDefault();
         try {
-            const response= await axios.post('/copypage', {key: data.key, Sname: data.Sname, Rname: data.Rname});
+            const response = await axios.post('/getclip', {key: data.key, Sname: data.Sname, Rname: data.Rname});
             if(response.data.error){
                 toast.error(response.data.error)
+                setTimeRemaining(null); // Clear timer on error
+                setClipCreatedAt(null); // Clear createdAt on error
+                setData(prevData => ({ ...prevData, content: "" })); // Clear content on error
             } else {
-                setData(prevData => ({ ...prevData, content: response.data.clip}));
+                setData(prevData => ({ ...prevData, content: response.data.content}));
+                setClipCreatedAt(response.data.createdAt); // Set createdAt from backend
+                toast.success('Clip retrieved successfully!');
             }
         } catch (error) {
-            console.log(error);
+            console.error('Error fetching data:', error);
             toast.error("Error fetching data.");
+            setTimeRemaining(null); // Clear timer on network error
+            setClipCreatedAt(null); // Clear createdAt on network error
+            setData(prevData => ({ ...prevData, content: "" })); // Clear content on network error
         }
     }
 

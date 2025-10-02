@@ -5,58 +5,113 @@
   justify-content: center;
   min-height: calc(100vh - 60px); /* Adjust based on navbar height */
   padding: 20px;
-  background-color: #f0f2f5; /* Light background for the form area */
+  background-color: var(--background-dark); /* Use dark theme background for container */
+  color: var(--text-color-dark);
 }
 
 .form-container h2 {
-  color: #333;
+  color: var(--primary-color); /* Primary color for headings */
   margin-bottom: 25px;
-  font-size: 2em;
+  font-size: 2.2em;
+  font-weight: 700;
 }
 
 .auth-form {
-  background-color: #ffffff;
+  background-color: var(--card-background-dark); /* Use card background for forms */
   padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px; /* Slightly more rounded */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4); /* Deeper shadow */
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 400px;
+  max-width: 450px; /* Slightly wider forms */
+  border: 1px solid var(--border-color-dark);
 }
 
 .auth-form label {
-  margin-bottom: 8px;
-  font-weight: bold;
-  color: #555;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: var(--text-color-dark);
+  align-self: flex-start; /* Align labels to the left */
+  font-size: 0.95em;
 }
 
 .auth-form input[type="text"],
 .auth-form input[type="email"],
-.auth-form input[type="password"] {
-  padding: 10px;
-  margin-bottom: 20px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+.auth-form input[type="password"],
+.auth-form textarea { /* Add textarea for content */
+  padding: 12px;
+  margin-bottom: 25px; /* More space below inputs */
+  border: 1px solid var(--border-color-dark);
+  border-radius: 6px;
   font-size: 1em;
+  background-color: var(--background-dark); /* Input background */
+  color: var(--text-color-dark);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.auth-form input:focus {
-  border-color: #646cff;
+.auth-form input:focus,
+.auth-form textarea:focus {
+  border-color: var(--secondary-color); /* Secondary color on focus */
+  box-shadow: 0 0 0 3px rgba(171, 71, 188, 0.3); /* Subtle focus ring */
   outline: none;
 }
 
 .auth-form button {
-  background-color: #646cff;
+  background-color: var(--primary-color);
   color: white;
-  padding: 12px 20px;
+  padding: 14px 25px; /* Larger padding for buttons */
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 1.1em;
-  transition: background-color 0.3s ease;
+  font-weight: 700;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .auth-form button:hover {
-  background-color: #535bf2;
+  background-color: var(--secondary-color);
+  transform: translateY(-3px); /* More pronounced lift */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* Adjustments for light theme */
+@media (prefers-color-scheme: light) {
+  .form-container {
+    background-color: var(--background-light);
+    color: var(--text-color-light);
+  }
+  .form-container h2 {
+    color: var(--primary-color);
+  }
+  .auth-form {
+    background-color: var(--card-background-light);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color-light);
+  }
+  .auth-form label {
+    color: var(--text-color-light);
+  }
+  .auth-form input[type="text"],
+  .auth-form input[type="email"],
+  .auth-form input[type="password"],
+.auth-form textarea {
+    background-color: #ffffff;
+    color: var(--text-color-light);
+    border: 1px solid var(--border-color-light);
+  }
+  .auth-form input:focus,
+  .auth-form textarea:focus {
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(171, 71, 188, 0.15);
+  }
+  .auth-form button {
+    background-color: var(--primary-color);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  }
+  .auth-form button:hover {
+    background-color: var(--secondary-color);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
 }

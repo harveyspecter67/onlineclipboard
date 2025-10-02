@@ -2,11 +2,13 @@ const express = require('express');
 const cors = require('cors');
 const dotenv =require('dotenv').config();
 const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 //Middleware
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
+app.use(cookieParser());
 // Configure CORS explicitly here, and only here
 app.use(cors({
     origin: 'http://localhost:5173', // Your frontend's origin

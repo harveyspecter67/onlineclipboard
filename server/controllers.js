@@ -1,7 +1,8 @@
-const {v4 : uuidv4} = require('uuid');
+// const {v4 : uuidv4} = require('uuid');
 const UserModel=require('./models/user');
 const bcrypt=require('bcryptjs')
 const clip = require('./models/clip')
+const jwt =require('jsonwebtoken')
 //Register user
 const userRegister = async(req,res)=>{
     try{
@@ -29,7 +30,9 @@ const userRegister = async(req,res)=>{
             email,
             password:hashedPassword,
         });
-        return res.json(user);
+        const token = jwt.sign({id:user._id, email:user.email}, process.env.JWT_SECRET, {expiresIn: '2m'});
+        return res.cookie('token', token,{httpOnly: true,secure: process.env.NODE_ENV==='production'})
+        .json({message: 'Registration Successful', user: {id:user._id, name:user.name,email:user.email}});
     }
     catch(error){
         console.log(error);
@@ -50,8 +53,9 @@ const userLogin = async (req,res)=>{
         //Check password
         const passwordMatch= await bcrypt.compare(password,user.password);
         if(passwordMatch){
-            //generate jwt
-            return res.json({message: 'Login successful' , user:user});
+            const token = jwt.sign({id:user._id,email:user.email}.process.env.JWT_SECRET, {expiresIn:'2m'});
+            return res.cookie('token', token,{httpOnly:true,secure:process.env.NODE_ENV==='production'})
+            .json({message:'Login successful', user:{id:user._id,name:user.name,email:user.email}});
         }
         else{
             return res.json({error:'Invalid credentials'});
@@ -69,7 +73,27 @@ const putClip = async(req,res)=>{
 if(!content ||!Sname || !Rname ){
     return res.json({error:'All fields required'});
 }
-const generatedKey = uuidv4();
+// const generatedKey = uuidv4();
+let isUnique = false;
+let attempts =0;
+while(!isUnique && attempts<=10){
+const generatedKey= () => {
+    const char = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for(let i =1;i<=6;i++){
+        result+=char.charAt(Math.floor(Math.random()* charactersLength));
+    }
+    return result;
+}
+const existingClip= await mongoose.findOne({key : generatedKey});
+if(!existingClip){
+    isUnique = true;
+}
+attempts ++;
+if (!isUnique) {
+    return res.json({ error: 'Failed to generate a unique key after multiple attempts. Please try again.' });
+}
+}
 const newClip = await clip.create({
     content,Sname,Rname,key:generatedKey,
 });
@@ -93,7 +117,7 @@ try {
     }
     else{
             console.log("Clip found")
-            return res.json({clip : clipInDB.content})
+            return res.json({message :'Clip found' ,clip : clipInDB.content, createdAt: clipInDB.createdAt});
     }
     
 } catch (error) {
@@ -101,9 +125,36 @@ try {
     return res.json({error:'Something went wrong'})
 }
 };
+const getProfile = (req,res) =>{
+const { token } = req.cookies;//get token from cookies
+if(token){
+    jwt.verify(token, process.env.JWT_SECRET, {} ,(err, user) => {
+        if(err){
+            console.log("JWT verification error: ", err);
+            return res.json({error: 'Invalid token'});
+        }
+        
+        UserModel.findById(user.id)
+        .then(foundUser=>{
+            if(!foundUser){
+                return res.json({error: 'User not found'});
+            }
+            return res.json({user: {id: foundUser._id, name:foundUser.name, email: foundUser.email}});
+        })
+        .catch(DBerror=>{
+            console.log("Db error fetching user: ", DBerror);
+            return res.json({error:"Database error fetching user"});
+        });
+    });
+}
+else{
+    return res.json({user:null});
+}
+};
 module.exports ={
     userRegister,
     userLogin,
     putClip,
     getClip,
+    getProfile,
 };
