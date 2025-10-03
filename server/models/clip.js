@@ -18,6 +18,6 @@ const clipSchema = new mongoose.Schema({
         unique:true
     }
 }, {timestamps:true});
-
+clipSchema.index({"createdAt" : 1}, { expireAfterSeconds: 120});
 const clip = mongoose.model('Clip',clipSchema);
-module.exports=clip;
+module.exports=clip

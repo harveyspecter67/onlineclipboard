@@ -1,14 +1,15 @@
-import {Link} from "react-router-dom";
-import './Navbar.css'; // Import the new CSS file
+import {Link} from 'react-router-dom';
+import './Navbar.css';
 
-const Navbar = () => {
+export default function Navbar() {
   return (
-   <nav className="navbar">
-    <Link to ='/'>Home</Link>
-    <Link to ='/register'>Register</Link>
-    <Link to ='/login'>Login</Link>
-   </nav>
+    <nav>
+        <Link to='/'>Home</Link>
+        <Link to='/register'>Register</Link>
+        <Link to='/login'>Login</Link>
+        <Link to='/pastepage'>Paste</Link> {/* Add Paste link */}
+        <Link to='/copypage'>Copy</Link>   {/* Add Copy link */}
+        <Link to='/about'>About</Link>     {/* Add About link */}
+    </nav>
   )
 }
-
-export default Navbar
